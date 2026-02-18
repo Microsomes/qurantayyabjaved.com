@@ -22,7 +22,7 @@ class ProgressController extends Controller
             'current_page' => $progress->current_page,
             'last_word_index' => $progress->last_word_index,
             'last_read_at' => $progress->last_read_at?->toISOString(),
-        ]);
+        ])->header('Cache-Control', 'no-store');
     }
 
     public function update(Request $request, int $id): JsonResponse

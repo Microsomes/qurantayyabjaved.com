@@ -19,10 +19,13 @@ export default function ReaderIndex() {
 
     const { data, loading, error } = useQuranPage(currentPage);
 
-    // Load saved progress on mount
+    // Load saved progress on mount (cache-bust to avoid stale browser cache)
     useEffect(() => {
         if (!profileId) return;
-        fetch(`/api/progress/${profileId}`, { credentials: 'same-origin' })
+        fetch(`/api/progress/${profileId}`, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+        })
             .then((r) => r.json())
             .then((p) => {
                 if (!initialPage && p.current_page) {
