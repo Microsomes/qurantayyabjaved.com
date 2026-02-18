@@ -12,7 +12,7 @@ use Inertia\Inertia;
 Route::get('/', fn () => Inertia::render('profiles/index'))->name('home');
 
 Route::middleware(ProfileSession::class)->group(function () {
-    Route::get('/read/{page?}', fn (int $page = 1) => Inertia::render('reader/index', ['initialPage' => $page]))->name('reader');
+    Route::get('/read/{page?}', fn (?int $page = null) => Inertia::render('reader/index', ['initialPage' => $page]))->name('reader');
     Route::get('/stats', fn () => Inertia::render('stats/index'))->name('stats');
     Route::get('/leaderboard', fn () => Inertia::render('leaderboard/index'))->name('leaderboard');
 });
