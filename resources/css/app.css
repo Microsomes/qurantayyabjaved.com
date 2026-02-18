@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@font-face {
+    font-family: 'KFGQPC Uthmanic Script HAFS';
+    src: url('/fonts/KFGQPCUthmanicScriptHAFS.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Amiri Quran';
+    src: url('/fonts/AmiriQuran-Regular.woff2') format('woff2');
+    font-display: swap;
+}
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-quran: 'KFGQPC Uthmanic Script HAFS', 'Amiri Quran', 'Traditional Arabic', serif;
+
+    --color-quran-bg: #fffef5;
+    --color-quran-bg-dark: #1a1a1a;
+    --color-ayah-marker: #d97706;
+    --color-word-highlight: oklch(0.905 0.093 93.83 / 0.5);
+    --color-word-highlight-dark: oklch(0.553 0.083 55.72 / 0.5);
+}
