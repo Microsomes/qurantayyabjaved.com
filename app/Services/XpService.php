@@ -67,7 +67,7 @@ class XpService
         $profileXp->save();
 
         $session = ReadingSession::firstOrCreate(
-            ['profile_id' => $profile->id, 'date' => now()->toDateString()],
+            ['profile_id' => $profile->id, 'date' => today()],
             ['pages_read' => [], 'xp_earned' => 0, 'duration_seconds' => 0],
         );
 
@@ -91,11 +91,12 @@ class XpService
     {
         $profileXp = $profile->xp ?? ProfileXp::create(['profile_id' => $profile->id]);
 
-        $session = ReadingSession::where('profile_id', $profile->id)
-            ->where('date', now()->toDateString())
-            ->first();
+        $session = ReadingSession::firstOrCreate(
+            ['profile_id' => $profile->id, 'date' => today()],
+            ['pages_read' => [], 'xp_earned' => 0, 'duration_seconds' => 0],
+        );
 
-        if ($session) {
+        if (! $session->wasRecentlyCreated) {
             return 0;
         }
 
@@ -103,13 +104,8 @@ class XpService
         $profileXp->level = self::levelFromXp($profileXp->total_xp);
         $profileXp->save();
 
-        ReadingSession::create([
-            'profile_id' => $profile->id,
-            'date' => now()->toDateString(),
-            'pages_read' => [],
-            'xp_earned' => self::XP_DAILY_LOGIN,
-            'duration_seconds' => 0,
-        ]);
+        $session->xp_earned = self::XP_DAILY_LOGIN;
+        $session->save();
 
         return self::XP_DAILY_LOGIN;
     }

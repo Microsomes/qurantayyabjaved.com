@@ -73,7 +73,7 @@ class ProgressController extends Controller
         $profile = Profile::findOrFail($id);
 
         $session = ReadingSession::firstOrCreate(
-            ['profile_id' => $profile->id, 'date' => now()->toDateString()],
+            ['profile_id' => $profile->id, 'date' => today()],
             ['pages_read' => [], 'xp_earned' => 0, 'duration_seconds' => 0],
         );
 

@@ -81,9 +81,9 @@ class GamificationController extends Controller
             ->selectRaw('profile_id, SUM(xp_earned) as period_xp, COUNT(DISTINCT date) as days_active');
 
         if ($period === 'daily') {
-            $query->where('date', now()->toDateString());
+            $query->where('date', today());
         } elseif ($period === 'weekly') {
-            $query->where('date', '>=', now()->startOfWeek()->toDateString());
+            $query->where('date', '>=', now()->startOfWeek());
         }
 
         $rankings = $query->groupBy('profile_id')
