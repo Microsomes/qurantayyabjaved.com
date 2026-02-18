@@ -36,7 +36,7 @@ export default function ReaderIndex() {
     }, [profileId, initialPage]);
 
     // Auto-save
-    useAutoSave({
+    const { saveManually, saveStatus } = useAutoSave({
         profileId: profileId!,
         currentPage,
         lastWordIndex: selectedWordIndex,
@@ -137,7 +137,7 @@ export default function ReaderIndex() {
 
                 {/* Bottom navigation */}
                 <nav className="sticky bottom-0 z-20 border-t border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-900/90">
-                    <PageNavigation currentPage={currentPage} juz={data?.juz ?? null} onPageChange={goToPage} />
+                    <PageNavigation currentPage={currentPage} juz={data?.juz ?? null} onPageChange={goToPage} onSave={saveManually} saveStatus={saveStatus} />
                 </nav>
             </div>
         </>

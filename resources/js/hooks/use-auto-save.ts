@@ -1,5 +1,7 @@
 import { csrfHeaders } from '@/lib/utils';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 interface AutoSaveOptions {
     profileId: number;
@@ -10,8 +12,10 @@ interface AutoSaveOptions {
 
 export function useAutoSave({ profileId, currentPage, lastWordIndex, enabled }: AutoSaveOptions) {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const statusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastSavedRef = useRef<string>('');
     const latestRef = useRef({ profileId, currentPage, lastWordIndex });
+    const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
     // Keep latest values in ref so cleanup/beacon can access them
     latestRef.current = { profileId, currentPage, lastWordIndex };
@@ -31,6 +35,28 @@ export function useAutoSave({ profileId, currentPage, lastWordIndex, enabled }: 
         } catch {
             // Silent fail — will retry on next change
         }
+    }, [profileId, currentPage, lastWordIndex]);
+
+    // Manual save — always fires, returns success/failure via status
+    const saveManually = useCallback(async () => {
+        setSaveStatus('saving');
+        if (statusTimeoutRef.current) clearTimeout(statusTimeoutRef.current);
+
+        try {
+            const res = await fetch(`/api/progress/${profileId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
+                credentials: 'same-origin',
+                body: JSON.stringify({ current_page: currentPage, last_word_index: lastWordIndex }),
+            });
+            if (!res.ok) throw new Error();
+            lastSavedRef.current = `${currentPage}-${lastWordIndex}`;
+            setSaveStatus('saved');
+        } catch {
+            setSaveStatus('error');
+        }
+
+        statusTimeoutRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
     }, [profileId, currentPage, lastWordIndex]);
 
     useEffect(() => {
@@ -72,5 +98,12 @@ export function useAutoSave({ profileId, currentPage, lastWordIndex, enabled }: 
         };
     }, [enabled]);
 
-    return { save };
+    // Cleanup status timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (statusTimeoutRef.current) clearTimeout(statusTimeoutRef.current);
+        };
+    }, []);
+
+    return { save, saveManually, saveStatus };
 }
