@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('profile_id')->constrained()->cascadeOnDelete();
             $table->date('date');
-            $table->json('pages_read')->default('[]');
+            $table->json('pages_read');
             $table->integer('xp_earned')->default(0);
             $table->integer('duration_seconds')->default(0);
             $table->timestamps();
